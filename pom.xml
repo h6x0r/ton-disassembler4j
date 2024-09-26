@@ -6,7 +6,7 @@
 
     <groupId>org.ton</groupId>
     <artifactId>ton-disassembler4j</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
