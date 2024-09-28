@@ -42,7 +42,8 @@
     <scm>
         <connection>scm:git:git://github.com/h6x0r/ton-disassembler4j.git</connection>
         <developerConnection>scm:git:ssh://github.com/h6x0r/ton-disassembler4j.git</developerConnection>
-        <url>https://github.com/h6x0r/ton-disassembler4j</url>
+        <url>https://github.com/h6x0r/ton-disassembler4j/tree/main</url>
+        <tag>ton-disassembler4j-1.0.0</tag>
     </scm>
 
     <dependencies>
