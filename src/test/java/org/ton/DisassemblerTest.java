@@ -8,7 +8,6 @@ import org.ton.java.cell.Cell;
 import org.ton.java.fift.FiftRunner;
 import org.ton.java.func.FuncRunner;
 import org.ton.java.tonlib.Tonlib;
-import org.ton.java.tonlib.types.AccountState;
 import org.ton.java.tonlib.types.FullAccountState;
 import org.ton.java.utils.Utils;
 
