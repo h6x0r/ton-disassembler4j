@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -51,12 +52,11 @@ public class DisassemblerTest {
         assertEquals(loadSnapshot("nft"), result);
     }
 
-    @Disabled
     @Test
     public void shouldDumpMethod() throws Exception {
         String code = loadFiftFromFunc();
         Cell codeCell = Cell.fromBoc(code);
-        String result = Disassembler.fromCode(codeCell);
+        String result = normalizeLines(Disassembler.fromCode(codeCell));
         assertEquals(loadSnapshot("dump"), result);
     }
 
@@ -133,6 +133,12 @@ public class DisassemblerTest {
 
         if (Files.notExists(fiftFile.toPath())) {
             Files.write(fiftFile.toPath(), fiftCode.getBytes());
+            if (!fiftCode.contains("2 boc+>B")) {
+                Files.write(
+                        fiftFile.toPath(),
+                        "2 boc+>B dup Bx.".getBytes(),
+                        StandardOpenOption.APPEND);
+            }
         }
 
         FiftRunner fiftRunner = FiftRunner.builder().build();

@@ -44,7 +44,6 @@ public class KnownMethods {
         map.put(128411, "get_royalty_params");
         map.put(129619, "get_telemint_auction_config");
         map.put(524286, "run_ticktock");
-        map.put(524287, "recv_external"); // two keys for the method name
 
         METHODS = Collections.unmodifiableMap(map);
     }
