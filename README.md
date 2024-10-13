@@ -28,11 +28,11 @@ Tonlib tonlib = Tonlib.builder()
                 .build();
 
 Address address = Address.of(addr);
-FullAccountState accountState = tonlib.getAccountState(address);
+FullAccountState accountState = this.tonlib.getAccountState(this.address);
 
-byte[] accountStateCode = Utils.base64ToBytes(accountState.getAccount_state().getCode());
+byte[] accountStateCode = Utils.base64ToBytes(this.accountState.getAccount_state().getCode());
 
-String disassembledInstruction = Disassembler.fromBoc(accountStateCode);
+String disassembledInstruction = Disassembler.fromBoc(this.accountStateCode);
 ```
 
 ## Support ton-java development
