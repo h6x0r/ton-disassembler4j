@@ -15,6 +15,7 @@
         <maven.source.plugin>2.2.1</maven.source.plugin>
         <maven.javadoc.plugin>3.4.1</maven.javadoc.plugin>
         <maven.gpg.plugin>1.5</maven.gpg.plugin>
+        <central.publishing.maven.plugin>0.6.0</central.publishing.maven.plugin>
         <nexus.staging.plugin>1.6.7</nexus.staging.plugin>
     </properties>
 
@@ -141,6 +142,18 @@
             </plugin>
 
             <!-- Maven Plugin for Deployment and Release -->
+
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>${central.publishing.maven.plugin}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
