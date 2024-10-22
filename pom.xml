@@ -4,7 +4,7 @@
 
     <groupId>io.github.h6x0r</groupId>
     <artifactId>ton-disassembler4j</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.4-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -42,7 +42,7 @@
         <connection>scm:git:git://github.com/h6x0r/ton-disassembler4j.git</connection>
         <developerConnection>scm:git:git@github.com:h6x0r/ton-disassembler4j.git</developerConnection>
         <url>https://github.com/h6x0r/ton-disassembler4j/tree/main</url>
-        <tag>ton-disassembler4j-1.0.0</tag>
+        <tag>ton-disassembler4j-2.0.3</tag>
     </scm>
 
     <dependencies>

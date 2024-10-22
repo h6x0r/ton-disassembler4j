@@ -16,7 +16,7 @@ found [here](https://github.com/ton-blockchain/ton/actions).
 <dependency>
     <groupId>io.github.h6x0r</groupId>
     <artifactId>ton-disassembler4j</artifactId>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
 </dependency>
 ```
 
