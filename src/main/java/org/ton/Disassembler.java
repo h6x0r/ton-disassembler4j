@@ -1,5 +1,6 @@
 package org.ton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ton.codepages.CP0Auto;
 import org.ton.consts.KnownMethods;
 import org.ton.java.cell.Cell;
@@ -14,6 +15,10 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 public class Disassembler {
+
+    private static String repeatSpaces(int count) {
+        return new String(new char[count]).replace('\0', ' ');
+    }
 
     public static String decompile(CellSlice cs, Integer indent) {
         StringBuilder result = new StringBuilder();
@@ -60,8 +65,8 @@ public class Disassembler {
 
     public static String decompileMethodsMap(CellSlice cs, int keyLen, Integer indent) {
         TonHashMap methodsMap = cs.loadDict(keyLen,
-            k -> k.readInt(keyLen).intValue(),
-            v -> v
+                k -> k.readInt(keyLen).intValue(),
+                v -> v
         );
         Map<Integer, String> methodsMapDecompiled = new LinkedHashMap<>();
 
@@ -74,7 +79,7 @@ public class Disassembler {
                 methodsMapDecompiled.put(key, decompile(CellSlice.beginParse(val), actualIndent + 4));
             } catch (Exception e) {
                 System.err.println(e.getMessage());
-                String spacesToAdd = " ".repeat(actualIndent != 0 ? actualIndent : 4);
+                String spacesToAdd = repeatSpaces(actualIndent != 0 ? actualIndent : 4);
                 String errVal = val.toString() + spacesToAdd;
                 methodsMapDecompiled.put(key, errVal);
             }
@@ -94,14 +99,14 @@ public class Disassembler {
             populateResult(result, String.format("%s:\n%s", methodName, code), actualIndent);
         }
 
-        if (!result.isEmpty()) {
+        if (StringUtils.isNotEmpty(result)) {
             result.setLength(result.length() - 1); // remove trailing newline
         }
 
         actualIndent -= 2;
         populateResult(result, ")", actualIndent);
 
-        if (!result.isEmpty()) {
+        if (StringUtils.isNotEmpty(result)) {
             result.setLength(result.length() - 1); // remove trailing newline
         }
 
@@ -109,7 +114,7 @@ public class Disassembler {
     }
 
     private static void populateResult(StringBuilder result, String txt, int indent) {
-        result.append(" ".repeat(indent)).append(txt).append("\n");
+        result.append(repeatSpaces(indent)).append(txt).append("\n");
     }
 
     public static String fromCode(Cell cell) {

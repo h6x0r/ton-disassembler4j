@@ -19,7 +19,7 @@ public class CP0Auto extends Codepage {
     }
 
     private Cell fetchSubSlice(CellSlice cs, int bits, int refs) {
-        var cb = CellBuilder.beginCell();
+        CellBuilder cb = CellBuilder.beginCell();
         for (int i = 0; i < bits; i++) {
             cb.storeBit(cs.loadBit());
         }
@@ -30,9 +30,13 @@ public class CP0Auto extends Codepage {
         return cb.endCell();
     }
 
+    private String repeatSpaces(int count) {
+        return new String(new char[count]).replace('\0', ' ');
+    }
+
     private void init() {
         this.insertHex("0", 4, (slice, indent) -> {
-            var n = slice.loadUint(4);
+            BigInteger n = slice.loadUint(4);
             if (n.equals(BigInteger.ZERO)) {
                 return "NOP";
             }
@@ -40,139 +44,139 @@ public class CP0Auto extends Codepage {
         });
 
         this.insertHex("1", 4, (slice, indent) -> {
-            var n = slice.loadUint(4);
+            BigInteger n = slice.loadUint(4);
             if (n.equals(BigInteger.ZERO)) {
-                var i = slice.loadUint(4);
-                var j = slice.loadUint(4);
+                BigInteger i = slice.loadUint(4);
+                BigInteger j = slice.loadUint(4);
                 return String.format("s%d s%d XCHG", i.intValue(), j.intValue());
             }
             if (n.equals(BigInteger.ONE)) {
-                var i = slice.loadUint(8);
+                BigInteger i = slice.loadUint(8);
                 return String.format("s0 s%d XCHG", i.intValue());
             }
             return String.format("s1 s%d XCHG", n.intValue());
         });
 
         this.insertHex("2", 4, (slice, indent) -> {
-            var n = slice.loadUint(4);
+            BigInteger n = slice.loadUint(4);
             return String.format("s%d PUSH", n.intValue());
         });
 
         this.insertHex("3", 4, (slice, indent) -> {
-            var n = slice.loadUint(4);
+            BigInteger n = slice.loadUint(4);
             return String.format("s%d POP", n.intValue());
         });
 
         this.insertHex("4", 4, (slice, indent) -> {
-            var i = slice.loadUint(4);
-            var j = slice.loadUint(4);
-            var k = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
+            BigInteger j = slice.loadUint(4);
+            BigInteger k = slice.loadUint(4);
             return String.format("s%d s%d s%d XCHG3", i.intValue(), j.intValue(), k.intValue());
         });
 
         this.insertHex("50", 8, (slice, indent) -> {
-            var i = slice.loadUint(4);
-            var j = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
+            BigInteger j = slice.loadUint(4);
             return String.format("s%d s%d XCHG2", i.intValue(), j.intValue());
         });
 
         this.insertHex("51", 8, (slice, indent) -> {
-            var i = slice.loadUint(4);
-            var j = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
+            BigInteger j = slice.loadUint(4);
             return String.format("s%d s%d XCPU", i.intValue(), j.intValue());
         });
 
         this.insertHex("52", 8, (slice, indent) -> {
-            var i = slice.loadUint(4);
-            var j = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
+            BigInteger j = slice.loadUint(4);
             return String.format("s%d s%d PUXC", i.intValue(), j.subtract(BigInteger.ONE).intValue());
         });
 
         this.insertHex("53", 8, (slice, indent) -> {
-            var args = slice.loadUint(8);
-            var first = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var second = args.and(BigInteger.valueOf(0xf));
+            BigInteger args = slice.loadUint(8);
+            BigInteger first = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger second = args.and(BigInteger.valueOf(0xf));
             return String.format("s%d s%d PUSH2", first.intValue(), second.intValue());
         });
 
         this.insertHex("540", 12, (slice, indent) -> {
-            var args = slice.loadUint(12);
-            var first = args.shiftRight(8).and(BigInteger.valueOf(0xf));
-            var second = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var third = args.and(BigInteger.valueOf(0xf));
+            BigInteger args = slice.loadUint(12);
+            BigInteger first = args.shiftRight(8).and(BigInteger.valueOf(0xf));
+            BigInteger second = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger third = args.and(BigInteger.valueOf(0xf));
             return String.format("s%d s%d s%d XCHG3", first.intValue(), second.intValue(), third.intValue());
         });
 
         this.insertHex("541", 12, (slice, indent) -> {
-            var args = slice.loadUint(12);
-            var i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
-            var j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var k = args.and(BigInteger.valueOf(0xf));
+            BigInteger args = slice.loadUint(12);
+            BigInteger i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
+            BigInteger j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger k = args.and(BigInteger.valueOf(0xf));
             return String.format("%d %d %d XC2PU", i.intValue(), j.intValue(), k.intValue());
         });
 
         this.insertHex("542", 12, (slice, indent) -> {
-            var args = slice.loadUint(12);
-            var i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
-            var j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var k = args.and(BigInteger.valueOf(0xf));
+            BigInteger args = slice.loadUint(12);
+            BigInteger i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
+            BigInteger j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger k = args.and(BigInteger.valueOf(0xf));
             return String.format("%d %d %d XCPUXC", i.intValue(), j.intValue(), k.subtract(BigInteger.ONE).intValue());
         });
 
         this.insertHex("543", 12, (slice, indent) -> {
-            var args = slice.loadUint(12);
-            var i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
-            var j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var k = args.and(BigInteger.valueOf(0xf));
+            BigInteger args = slice.loadUint(12);
+            BigInteger i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
+            BigInteger j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger k = args.and(BigInteger.valueOf(0xf));
             return String.format("%d %d %d XCPU2", i.intValue(), j.intValue(), k.intValue());
         });
 
         this.insertHex("544", 12, (slice, indent) -> {
-            var args = slice.loadUint(12);
-            var i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
-            var j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var k = args.and(BigInteger.valueOf(0xf));
+            BigInteger args = slice.loadUint(12);
+            BigInteger i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
+            BigInteger j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger k = args.and(BigInteger.valueOf(0xf));
             return String.format("%d %d %d PUXC2", i.intValue(), j.subtract(BigInteger.ONE).intValue(), k.subtract(BigInteger.ONE).intValue());
         });
 
         this.insertHex("545", 12, (slice, indent) -> {
-            var args = slice.loadUint(12);
-            var i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
-            var j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var k = args.and(BigInteger.valueOf(0xf));
+            BigInteger args = slice.loadUint(12);
+            BigInteger i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
+            BigInteger j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger k = args.and(BigInteger.valueOf(0xf));
             return String.format("%d %d %d PUXCPU", i.intValue(), j.subtract(BigInteger.ONE).intValue(), k.subtract(BigInteger.ONE).intValue());
         });
 
         this.insertHex("546", 12, (slice, indent) -> {
-            var args = slice.loadUint(12);
-            var i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
-            var j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var k = args.and(BigInteger.valueOf(0xf));
-            return String.format("%d %d %d PU2XC", i.intValue(), j.subtract(BigInteger.ONE).intValue(), k.subtract(BigInteger.TWO).intValue());
+            BigInteger args = slice.loadUint(12);
+            BigInteger i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
+            BigInteger j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger k = args.and(BigInteger.valueOf(0xf));
+            return String.format("%d %d %d PU2XC", i.intValue(), j.subtract(BigInteger.ONE).intValue(), k.subtract(BigInteger.valueOf(2)).intValue());
         });
 
         this.insertHex("547", 12, (slice, indent) -> {
-            var args = slice.loadUint(12);
-            var i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
-            var j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var k = args.and(BigInteger.valueOf(0xf));
+            BigInteger args = slice.loadUint(12);
+            BigInteger i = args.shiftRight(8).and(BigInteger.valueOf(0xf));
+            BigInteger j = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger k = args.and(BigInteger.valueOf(0xf));
             return String.format("%d %d %d PUSH3", i.intValue(), j.intValue(), k.intValue());
         });
 
         this.insertHex("55", 8, (slice, indent) -> {
-            var args = slice.loadUint(8);
-            var i = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var j = args.and(BigInteger.valueOf(0xf));
+            BigInteger args = slice.loadUint(8);
+            BigInteger i = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger j = args.and(BigInteger.valueOf(0xf));
             return String.format("%d %d BLKSWAP", i.add(BigInteger.ONE).intValue(), j.add(BigInteger.ONE).intValue());
         });
 
         this.insertHex("56", 8, (slice, indent) -> {
-            var args = slice.loadUint(8);
+            BigInteger args = slice.loadUint(8);
             return String.format("s%d PUSH", args.intValue());
         });
 
         this.insertHex("57", 8, (slice, indent) -> {
-            var args = slice.loadUint(8);
+            BigInteger args = slice.loadUint(8);
             return String.format("s%d POP", args.intValue());
         });
 
@@ -189,15 +193,15 @@ public class CP0Auto extends Codepage {
         this.insertHex("5d", 8, (slice, indent) -> "2OVER");
 
         this.insertHex("5e", 8, (slice, indent) -> {
-            var args = slice.loadUint(8);
-            var i = args.shiftRight(4).and(BigInteger.valueOf(0xf));
-            var j = args.and(BigInteger.valueOf(0xf));
-            return String.format("%d %d REVERSE", i.add(BigInteger.TWO).intValue(), j.intValue());
+            BigInteger args = slice.loadUint(8);
+            BigInteger i = args.shiftRight(4).and(BigInteger.valueOf(0xf));
+            BigInteger j = args.and(BigInteger.valueOf(0xf));
+            return String.format("%d %d REVERSE", i.add(BigInteger.valueOf(2)).intValue(), j.intValue());
         });
 
         this.insertHex("5f", 8, (slice, indent) -> {
-            var i = slice.loadUint(4);
-            var j = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
+            BigInteger j = slice.loadUint(4);
             if (i.equals(BigInteger.ZERO)) {
                 return String.format("%d BLKDROP", j.intValue());
             }
@@ -218,8 +222,8 @@ public class CP0Auto extends Codepage {
         this.insertHex("6b", 8, (slice, indent) -> "ONLYX");
         // 7077888 (DUMMY)
         this.insertHex("6c", 8, (slice, indent) -> {
-            var i = slice.loadUint(4);
-            var j = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
+            BigInteger j = slice.loadUint(4);
             return String.format("%d %d BLKDROP2", i.intValue(), j.intValue());
         });
 
@@ -227,14 +231,14 @@ public class CP0Auto extends Codepage {
         this.insertHex("6e", 8, (slice, indent) -> "ISNULL");
 
         this.insertHex("6f0", 12, (slice, indent) -> {
-            var n = slice.loadUint(4);
+            BigInteger n = slice.loadUint(4);
             if (n.equals(BigInteger.ZERO)) {
                 return "NIL";
             }
             if (n.equals(BigInteger.ONE)) {
                 return "SINGLE";
             }
-            if (n.equals(BigInteger.TWO)) {
+            if (n.equals(BigInteger.valueOf(2))) {
                 return "PAIR";
             }
             if (n.equals(BigInteger.valueOf(3))) {
@@ -243,34 +247,34 @@ public class CP0Auto extends Codepage {
             return String.format("%d TUPLE", n.intValue());
         });
         this.insertHex("6f1", 12, (slice, indent) -> {
-            var k = slice.loadUint(4);
+            BigInteger k = slice.loadUint(4);
             return String.format("%d INDEX", k.intValue());
         });
         this.insertHex("6f2", 12, (slice, indent) -> {
-            var k = slice.loadUint(4);
+            BigInteger k = slice.loadUint(4);
             return String.format("%d UNTUPLE", k.intValue());
         });
         this.insertHex("6f3", 12, (slice, indent) -> {
-            var k = slice.loadUint(4);
+            BigInteger k = slice.loadUint(4);
             if (k.equals(BigInteger.ZERO)) {
                 return "CHKTUPLE";
             }
             return String.format("%d UNPACKFIRST", k.intValue());
         });
         this.insertHex("6f4", 12, (slice, indent) -> {
-            var k = slice.loadUint(4);
+            BigInteger k = slice.loadUint(4);
             return String.format("%d EXPLODE", k.intValue());
         });
         this.insertHex("6f5", 12, (slice, indent) -> {
-            var k = slice.loadUint(4);
+            BigInteger k = slice.loadUint(4);
             return String.format("%d SETINDEX", k.intValue());
         });
         this.insertHex("6f6", 12, (slice, indent) -> {
-            var k = slice.loadUint(4);
+            BigInteger k = slice.loadUint(4);
             return String.format("%d INDEXQ", k.intValue());
         });
         this.insertHex("6f7", 12, (slice, indent) -> {
-            var k = slice.loadUint(4);
+            BigInteger k = slice.loadUint(4);
             return String.format("%d SETINDEXQ", k.intValue());
         });
         this.insertHex("6f80", 16, (slice, indent) -> "TUPLEVAR");
@@ -298,52 +302,52 @@ public class CP0Auto extends Codepage {
         this.insertHex("6fa7", 16, (slice, indent) -> "NULLROTRIFNOT2");
         // 7317504 (DUMMY)
         this.insertHex("6fb", 12, (slice, indent) -> {
-            var i = slice.loadUint(2);
-            var j = slice.loadUint(2);
+            BigInteger i = slice.loadUint(2);
+            BigInteger j = slice.loadUint(2);
             return String.format("%d %d INDEX2", i.intValue(), j.intValue());
         });
 
         // this.insertHex("6fc", 10, (slice, indent) => {
-        //     var i = slice.loadUint(2);
-        //     var j = slice.loadUint(2);
-        //     var k = slice.loadUint(2);
+        //     BigInteger i = slice.loadUint(2);
+        //     BigInteger j = slice.loadUint(2);
+        //     BigInteger k = slice.loadUint(2);
         //     return "String.format("%d %d %d INDEX3", i.intValue(), j.intValue(), k.intValue())";
         // });
 
         this.insertHex("7", 4, (slice, indent) -> {
-            var args = slice.loadInt(4);
+            BigInteger args = slice.loadInt(4);
             return String.format("%d PUSHINT", args.intValue());
         });
 
         this.insertHex("80", 8, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d PUSHINT", x.intValue());
         });
 
         this.insertHex("81", 8, (slice, indent) -> {
-            var x = slice.loadInt(16);
+            BigInteger x = slice.loadInt(16);
             return String.format("%d PUSHINT", x.intValue());
         });
 
         this.insertHex("82", 8, (slice, indent) -> {
-            var len = slice.loadUint(5);
-            var n = len.multiply(BigInteger.valueOf(8)).add(BigInteger.valueOf(19));
-            var x = slice.loadInt(n.intValue());
+            BigInteger len = slice.loadUint(5);
+            BigInteger n = len.multiply(BigInteger.valueOf(8)).add(BigInteger.valueOf(19));
+            BigInteger x = slice.loadInt(n.intValue());
             return String.format("%s PUSHINT", x.toString());
         });
 
         this.insertHex("83", 8, (slice, indent) -> {
-            var x = slice.loadUint(8).add(BigInteger.ONE);
+            BigInteger x = slice.loadUint(8).add(BigInteger.ONE);
             return String.format("%d PUSHPOW2", x.intValue());
         });
 
         this.insertHex("84", 8, (slice, indent) -> {
-            var x = slice.loadUint(8).add(BigInteger.ONE);
+            BigInteger x = slice.loadUint(8).add(BigInteger.ONE);
             return String.format("%d PUSHPOW2DEC", x.intValue());
         });
 
         this.insertHex("850000", 8, (slice, indent) -> {
-            var x = slice.loadUint(8).add(BigInteger.ONE);
+            BigInteger x = slice.loadUint(8).add(BigInteger.ONE);
             return String.format("%d PUSHNEGPOW2", x.intValue());
         });
 
@@ -353,70 +357,70 @@ public class CP0Auto extends Codepage {
         this.insertHex("8a", 8, (slice, indent) -> "PUSHREFCONT");
 
         this.insertHex("8b", 8, (slice, indent) -> {
-            var x = slice.loadUint(4);
-            var len = x.multiply(BigInteger.valueOf(8)).add(BigInteger.valueOf(4));
-            var subslice = fetchSubSlice(slice, len.intValue(), 0);
+            BigInteger x = slice.loadUint(4);
+            BigInteger len = x.multiply(BigInteger.valueOf(8)).add(BigInteger.valueOf(4));
+            Cell subslice = fetchSubSlice(slice, len.intValue(), 0);
             return "PUSHSLICE";
         });
 
         this.insertHex("8c0000", 8, (slice, indent) -> {
-            var r = slice.loadUint(2).add(BigInteger.ONE);
-            var xx = slice.loadUint(5);
-            var len = xx.multiply(BigInteger.valueOf(8)).add(BigInteger.ONE);
-            var subslice = fetchSubSlice(slice, len.intValue(), r.intValue());
+            BigInteger r = slice.loadUint(2).add(BigInteger.ONE);
+            BigInteger xx = slice.loadUint(5);
+            BigInteger len = xx.multiply(BigInteger.valueOf(8)).add(BigInteger.ONE);
+            Cell subslice = fetchSubSlice(slice, len.intValue(), r.intValue());
             return "PUSHSLICE";
         });
 
         this.insertHex("8d", 8, (slice, indent) -> {
-            var r = slice.loadUint(3);
-            var xx = slice.loadUint(7);
-            var len = xx.multiply(BigInteger.valueOf(8)).add(BigInteger.valueOf(6));
-            var subslice = fetchSubSlice(slice, len.intValue(), r.intValue());
+            BigInteger r = slice.loadUint(3);
+            BigInteger xx = slice.loadUint(7);
+            BigInteger len = xx.multiply(BigInteger.valueOf(8)).add(BigInteger.valueOf(6));
+            Cell subslice = fetchSubSlice(slice, len.intValue(), r.intValue());
             return "PUSHSLICE";
         });
 
         // 9281536 (DUMMY)
         this.insertHex("8E", 7, (slice, indent) -> {
-            var args = slice.loadUint(9);
-            var refs = args.shiftRight(7).and(BigInteger.valueOf(3));
-            var dataBytes = args.and(BigInteger.valueOf(127)).multiply(BigInteger.valueOf(8));
+            BigInteger args = slice.loadUint(9);
+            BigInteger refs = args.shiftRight(7).and(BigInteger.valueOf(3));
+            BigInteger dataBytes = args.and(BigInteger.valueOf(127)).multiply(BigInteger.valueOf(8));
 
-            var subslice = fetchSubSlice(slice, dataBytes.intValue(), refs.intValue());
-            var spaces = " ".repeat(indent);
+            Cell subslice = fetchSubSlice(slice, dataBytes.intValue(), refs.intValue());
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{%n%s%s}> PUSHCONT", decompile(CellSlice.beginParse(subslice), indent + 2), spaces);
         });
 
         this.insertHex("9", 4, (slice, indent) -> {
-            var len = slice.loadUint(4).multiply(BigInteger.valueOf(8));
-            var subslice = fetchSubSlice(slice, len.intValue(), 0);
-            var spaces = " ".repeat(indent);
+            BigInteger len = slice.loadUint(4).multiply(BigInteger.valueOf(8));
+            Cell subslice = fetchSubSlice(slice, len.intValue(), 0);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{%n%s%s}> PUSHCONT", decompile(CellSlice.beginParse(subslice), indent + 2), spaces);
         });
 
         this.insertHex("a00000", 8, (slice, indent) -> "ADD");
         this.insertHex("a10000", 8, (slice, indent) -> "SUB");
         this.insertHex("a20000", 8, (slice, indent) -> "SUBR");
-        this.insertHex("a30000", 8, (slice, indent) ->"NEGATE");
+        this.insertHex("a30000", 8, (slice, indent) -> "NEGATE");
         this.insertHex("a40000", 8, (slice, indent) -> "INC");
         this.insertHex("a50000", 8, (slice, indent) -> "DEC");
         this.insertHex("a60000", 8, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d ADDCONST", x);
         });
 
         this.insertHex("a70000", 8, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d MULCONST", x);
         });
 
         this.insertHex("a80000", 8, (slice, indent) -> "MUL");
         this.insertHex("A9", 8, (slice, indent) -> {
-            var m = slice.loadBit();
-            var s = slice.loadUint(2);
-            var c = slice.loadBit();
-            var d = slice.loadUint(2);
-            var f = slice.loadUint(2);
-            var opName = new StringBuilder();
+            boolean m = slice.loadBit();
+            BigInteger s = slice.loadUint(2);
+            boolean c = slice.loadBit();
+            BigInteger d = slice.loadUint(2);
+            BigInteger f = slice.loadUint(2);
+            StringBuilder opName = new StringBuilder();
 
             if (m) {
                 opName.append("MUL");
@@ -432,7 +436,7 @@ public class CP0Auto extends Codepage {
                 if (!c) {
                     opName.append(" s0");
                 } else {
-                    var shift = slice.loadUint(8).add(BigInteger.ONE);
+                    BigInteger shift = slice.loadUint(8).add(BigInteger.ONE);
                     opName.append(" ").append(shift.intValue());
                 }
             }
@@ -454,12 +458,12 @@ public class CP0Auto extends Codepage {
         // 11079680 (DUMMY)
         // 11132928 (DUMMY)
         this.insertHex("aa", 8, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d LSHIFT", cc.add(BigInteger.ONE));
         });
 
         this.insertHex("ab", 8, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d RSHIFT", cc.add(BigInteger.ONE));
         });
 
@@ -473,12 +477,12 @@ public class CP0Auto extends Codepage {
         this.insertHex("b2", 8, (slice, indent) -> "XOR");
         this.insertHex("b3", 8, (slice, indent) -> "NOT");
         this.insertHex("b4", 8, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d FITS", cc.add(BigInteger.ONE));
         });
 
         this.insertHex("b5", 8, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d UFITS", cc.add(BigInteger.ONE));
         });
 
@@ -499,21 +503,21 @@ public class CP0Auto extends Codepage {
         this.insertHex("b7a4", 16, (slice, indent) -> "QINC");
         this.insertHex("b7a5", 16, (slice, indent) -> "QDEC");
         this.insertHex("b7a6", 16, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%s QADDCONST", x.intValue());
         });
         this.insertHex("b7a7", 16, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%s QMULCONST", x.intValue());
         });
         this.insertHex("b7a8", 16, (slice, indent) -> "QMUL");
         this.insertHex("b7a9", 16, (slice, indent) -> {
-            var m = slice.loadBit();
-            var s = slice.loadUint(2);
-            var c = slice.loadBit();
-            var d = slice.loadUint(2);
-            var f = slice.loadUint(2);
-            var opName = new StringBuilder("Q");
+            boolean m = slice.loadBit();
+            BigInteger s = slice.loadUint(2);
+            boolean c = slice.loadBit();
+            BigInteger d = slice.loadUint(2);
+            BigInteger f = slice.loadUint(2);
+            StringBuilder opName = new StringBuilder("Q");
             if (m) {
                 opName.append("MUL");
             }
@@ -528,7 +532,7 @@ public class CP0Auto extends Codepage {
                 if (!c) {
                     opName.append(" s0");
                 } else {
-                    var shift = slice.loadUint(8).add(BigInteger.ONE);
+                    BigInteger shift = slice.loadUint(8).add(BigInteger.ONE);
                     opName.append(" ").append(shift.intValue());
                 }
             }
@@ -548,11 +552,11 @@ public class CP0Auto extends Codepage {
         });
         // 12036560 (DUMMY)
         this.insertHex("b7aa", 16, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%s QLSHIFT", cc.add(BigInteger.ONE).intValue());
         });
         this.insertHex("b7ab", 16, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%s QLSHIFT", cc.add(BigInteger.ONE).intValue());
         });
         this.insertHex("b7ac", 16, (slice, indent) -> "QLSHIFT");
@@ -564,11 +568,11 @@ public class CP0Auto extends Codepage {
         this.insertHex("b7b2", 16, (slice, indent) -> "QXOR");
         this.insertHex("b7b3", 16, (slice, indent) -> "QNOT");
         this.insertHex("b7b4", 16, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%s QFITS", cc.add(BigInteger.ONE).intValue());
         });
         this.insertHex("b7b5", 16, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%s QUFITS", cc.add(BigInteger.ONE).intValue());
         });
         this.insertHex("b7b600", 24, (slice, indent) -> "QFITSX");
@@ -588,19 +592,19 @@ public class CP0Auto extends Codepage {
         this.insertHex("b7be", 16, (slice, indent) -> "QGEQ");
         this.insertHex("b7bf", 16, (slice, indent) -> "QCMP");
         this.insertHex("b7c0", 16, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%s QEQINT", x.intValue());
         });
         this.insertHex("b7c1", 16, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d QLESSINT", x.intValue());
         });
         this.insertHex("b7c2", 16, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d QGTINT", x.intValue());
         });
         this.insertHex("b7c3", 16, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d QNEQINT", x.intValue());
         });
         // 12043264 (DUMMY)
@@ -613,19 +617,19 @@ public class CP0Auto extends Codepage {
         this.insertHex("be", 8, (slice, indent) -> "GEQ");
         this.insertHex("bf", 8, (slice, indent) -> "CMP");
         this.insertHex("c0", 8, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d EQINT", x.intValue());
         });
         this.insertHex("c1", 8, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d LESSINT", x.intValue());
         });
         this.insertHex("c2", 8, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d GTINT", x.intValue());
         });
         this.insertHex("c3", 8, (slice, indent) -> {
-            var x = slice.loadInt(8);
+            BigInteger x = slice.loadInt(8);
             return String.format("%d NEQINT", x.intValue());
         });
         this.insertHex("c4", 8, (slice, indent) -> "ISNAN");
@@ -654,20 +658,20 @@ public class CP0Auto extends Codepage {
         this.insertHex("c8", 8, (slice, indent) -> "NEWC");
         this.insertHex("c9", 8, (slice, indent) -> "ENDC");
         this.insertHex("ca", 8, (slice, indent) -> {
-            var cc = slice.loadUint(8).add(BigInteger.ONE);
+            BigInteger cc = slice.loadUint(8).add(BigInteger.ONE);
             return String.format("%d STI", cc.intValue());
         });
         this.insertHex("cb", 8, (slice, indent) -> {
-            var cc = slice.loadUint(8).add(BigInteger.ONE);
+            BigInteger cc = slice.loadUint(8).add(BigInteger.ONE);
             return String.format("%d STU", cc.intValue());
         });
         this.insertHex("cc", 8, (slice, indent) -> "STREF");
         this.insertHex("cd", 8, (slice, indent) -> "ENDCST");
         this.insertHex("ce", 8, (slice, indent) -> "STSLICE");
         this.insertHex("cf00", 13, (slice, indent) -> {
-            var args = slice.loadUint(3);
-            var sgnd = args.testBit(0);
-            var s = new StringBuilder("ST")
+            BigInteger args = slice.loadUint(3);
+            boolean sgnd = args.testBit(0);
+            StringBuilder s = new StringBuilder("ST")
                     .append(sgnd ? "I" : "U")
                     .append("X");
             if (args.testBit(1)) {
@@ -679,10 +683,10 @@ public class CP0Auto extends Codepage {
             return s.toString();
         });
         this.insertHex("cf08", 13, (slice, indent) -> {
-            var args = slice.loadUint(11);
+            BigInteger args = slice.loadUint(11);
             int bits = (args.intValue() & 0xff) + 1;
-            var sgnd = (args.intValue() & 0x100) != 0x100;
-            var s = new StringBuilder("ST");
+            boolean sgnd = (args.intValue() & 0x100) != 0x100;
+            StringBuilder s = new StringBuilder("ST");
             s.append(sgnd ? 'I' : 'U');
             if ((args.intValue() & 0x200) == 0x200) {
                 s.append('R');
@@ -709,15 +713,15 @@ public class CP0Auto extends Codepage {
         this.insertHex("cf1e", 16, (slice, indent) -> "STSLICERQ");
         this.insertHex("cf1f", 16, (slice, indent) -> "STBRQ");
         this.insertHex("cf20", 15, (slice, indent) -> {
-            var flag = slice.loadBit();
+            boolean flag = slice.loadBit();
             return flag ? "STREFCONST" : "STREF2CONST";
         });
         // 13574656 (DUMMY)
         this.insertHex("cf23", 16, (slice, indent) -> "ENDXC");
         // 13575168 (DUMMY)
         this.insertHex("cf28", 14, (slice, indent) -> {
-            var args = slice.loadUint(2);
-            var sgnd = !args.testBit(0);
+            BigInteger args = slice.loadUint(2);
+            boolean sgnd = !args.testBit(0);
             return "ST" + (sgnd ? "I" : "U") + "LE" + (args.testBit(1) ? "8" : "4");
         });
         // 13577216 (DUMMY)
@@ -730,14 +734,14 @@ public class CP0Auto extends Codepage {
         this.insertHex("cf36", 16, (slice, indent) -> "BREMREFS");
         this.insertHex("cf37", 16, (slice, indent) -> "BREMBITREFS");
         this.insertHex("cf38", 16, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d BCHKBITS", cc.add(BigInteger.ONE).intValue());
         });
         this.insertHex("cf39", 16, (slice, indent) -> "BCHKBITS");
         this.insertHex("cf3a", 16, (slice, indent) -> "BCHKREFS");
         this.insertHex("cf3b", 16, (slice, indent) -> "BCHKBITREFS");
         this.insertHex("cf3c", 16, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d BCHKBITSQ", cc.add(BigInteger.ONE).intValue());
         });
         this.insertHex("cf3d", 16, (slice, indent) -> "BCHKBITSQ");
@@ -748,35 +752,35 @@ public class CP0Auto extends Codepage {
         this.insertHex("cf42", 16, (slice, indent) -> "STSAME");
         // 13583104 (DUMMY)
         this.insertHex("cf8", 9, (slice, indent) -> {
-            var refs = slice.loadUint(2);
-            var dataBits = slice.loadUint(3).multiply(BigInteger.valueOf(8)).add(BigInteger.ONE);
+            BigInteger refs = slice.loadUint(2);
+            BigInteger dataBits = slice.loadUint(3).multiply(BigInteger.valueOf(8)).add(BigInteger.ONE);
             fetchSubSlice(slice, dataBits.intValue(), refs.intValue());
             return "STSLICECONST";
         });
         this.insertHex("d0", 8, (slice, indent) -> "CTOS");
         this.insertHex("d1", 8, (slice, indent) -> "ENDS");
         this.insertHex("d2", 8, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d LDI", cc.add(BigInteger.ONE).intValue());
         });
         this.insertHex("d3", 8, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d LDU", cc.add(BigInteger.ONE).intValue());
         });
         this.insertHex("d4", 8, (slice, indent) -> "LDREF");
         this.insertHex("d5", 8, (slice, indent) -> "LDREFRTOS");
         this.insertHex("d6", 8, (slice, indent) -> {
-            var cc = slice.loadUint(8);
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d LDSLICE", cc.add(BigInteger.ONE).intValue());
         });
         this.insertHex("d70", 12, (slice, indent) -> {
-            var longerVersion = slice.loadBit();
-            var quiet = slice.loadBit();
-            var preload = slice.loadBit();
-            var sign = slice.loadBit();
-            var s = new StringBuilder();
+            boolean longerVersion = slice.loadBit();
+            boolean quiet = slice.loadBit();
+            boolean preload = slice.loadBit();
+            boolean sign = slice.loadBit();
+            StringBuilder s = new StringBuilder();
             if (longerVersion) {
-                var length = slice.loadUint(8).add(BigInteger.ONE);
+                BigInteger length = slice.loadUint(8).add(BigInteger.ONE);
                 s.append(length.intValue()).append(" ");
             }
             s.append(preload ? "PLD" : "LD")
@@ -785,18 +789,18 @@ public class CP0Auto extends Codepage {
             return s.toString();
         });
         this.insertHex("d710", 13, (slice, indent) -> {
-            var c = slice.loadUint(3).add(BigInteger.ONE);
+            BigInteger c = slice.loadUint(3).add(BigInteger.ONE);
             return String.format("%d PLDUZ", 32 * (c.intValue() + 1));
         });
         this.insertHex("d718", 14, (slice, indent) -> {
-            var quiet = slice.loadBit();
-            var preload = slice.loadBit();
+            boolean quiet = slice.loadBit();
+            boolean preload = slice.loadBit();
             return (preload ? "PLD" : "LD") + "SLICEX" + (quiet ? "Q" : "");
         });
         this.insertHex("d71c", 14, (slice, indent) -> {
-            var quiet = slice.loadBit();
-            var preload = slice.loadBit();
-            var cc = slice.loadUint(8);
+            boolean quiet = slice.loadBit();
+            boolean preload = slice.loadBit();
+            BigInteger cc = slice.loadUint(8);
             return String.format("%d %sSLICEX%s", cc.add(BigInteger.ONE).intValue(),
                     preload ? "PLD" : "LD", quiet ? "Q" : "");
         });
@@ -837,14 +841,14 @@ public class CP0Auto extends Codepage {
         this.insertHex("d74a", 16, (slice, indent) -> "SREFS");
         this.insertHex("d74b", 16, (slice, indent) -> "SBITREFS");
         this.insertHex("d74c", 14, (slice, indent) -> {
-            var n = slice.loadUint(2);
+            BigInteger n = slice.loadUint(2);
             return String.format("%d PLDREFIDX", n.intValue());
         });
         this.insertHex("d750", 12, (slice, indent) -> {
-            var quiet = slice.loadBit();
-            var preload = slice.loadBit();
-            var bit64 = slice.loadBit();
-            var unsigned = slice.loadBit();
+            boolean quiet = slice.loadBit();
+            boolean preload = slice.loadBit();
+            boolean bit64 = slice.loadBit();
+            boolean unsigned = slice.loadBit();
             return String.format("%s%s%s%s",
                     preload ? "PLD" : "LD",
                     unsigned ? "U" : "I",
@@ -861,20 +865,20 @@ public class CP0Auto extends Codepage {
         this.insertHex("d8", 8, (slice, indent) -> "EXECUTE");
         this.insertHex("d9", 8, (slice, indent) -> "JMPX");
         this.insertHex("da", 8, (slice, indent) -> {
-            var p = slice.loadUint(4);
-            var r = slice.loadUint(4);
+            BigInteger p = slice.loadUint(4);
+            BigInteger r = slice.loadUint(4);
             return String.format("%d %d CALLXARGS", p.intValue(), r.intValue());
         });
         this.insertHex("db0", 12, (slice, indent) -> {
-            var p = slice.loadUint(4);
+            BigInteger p = slice.loadUint(4);
             return String.format("%d CALLXARGS", p.intValue());
         });
         this.insertHex("db1", 12, (slice, indent) -> {
-            var p = slice.loadUint(4);
+            BigInteger p = slice.loadUint(4);
             return String.format("%d JMPXARGS", p.intValue());
         });
         this.insertHex("db2", 12, (slice, indent) -> {
-            var r = slice.loadUint(4);
+            BigInteger r = slice.loadUint(4);
             return String.format("%d RETARGS", r.intValue());
         });
         this.insertHex("db30", 16, (slice, indent) -> "RET");
@@ -884,8 +888,8 @@ public class CP0Auto extends Codepage {
         this.insertHex("db34", 16, (slice, indent) -> "CALLCC");
         this.insertHex("db35", 16, (slice, indent) -> "JMPXDATA");
         this.insertHex("db36", 16, (slice, indent) -> {
-            var p = slice.loadUint(4);
-            var r = slice.loadUint(4);
+            BigInteger p = slice.loadUint(4);
+            BigInteger r = slice.loadUint(4);
             return String.format("%d %d CALLCCARGS", p.intValue(), r.intValue());
         });
         // 14366464 (DUMMY)
@@ -895,17 +899,17 @@ public class CP0Auto extends Codepage {
         this.insertHex("db3b", 16, (slice, indent) -> "CALLCCVARARGS");
         this.insertHex("db3c", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> CALLREF", decompile(subslice, indent + 2), spaces);
         });
         this.insertHex("db3d", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> JMPREF", decompile(subslice, indent + 2), spaces);
         });
         this.insertHex("db3e", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> JMPREFDATA", decompile(subslice, indent + 2), spaces);
         });
         this.insertHex("db3f", 16, (slice, indent) -> "RETDATA");
@@ -919,22 +923,22 @@ public class CP0Auto extends Codepage {
         this.insertHex("e2", 8, (slice, indent) -> "IFELSE");
         this.insertHex("e300", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> IFREF", decompile(subslice, indent + 2), spaces);
         });
         this.insertHex("e301", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> IFNOTREF", decompile(subslice, indent + 2), spaces);
         });
         this.insertHex("e302", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> IFJMPREF", decompile(subslice, indent + 2), spaces);
         });
         this.insertHex("e303", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> IFNOTJMPREF", decompile(subslice, indent + 2), spaces);
         });
         this.insertHex("e304", 16, (slice, indent) -> "CONDSEL");
@@ -945,17 +949,17 @@ public class CP0Auto extends Codepage {
         // 14879232 (DUMMY)
         this.insertHex("e30d", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> IFREFELSE", decompile(subslice, indent + 2), spaces);
         });
         this.insertHex("e30e", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> IFELSEREF", decompile(subslice, indent + 2), spaces);
         });
         this.insertHex("e30f", 16, (slice, indent) -> {
             CellSlice subslice = CellSlice.beginParse(slice.loadRef());
-            var spaces = " ".repeat(indent);
+            String spaces = this.repeatSpaces(indent);
             return String.format("<{\n%s%s}> IFREFELSEREF", decompile(subslice, indent + 2), spaces);
         });
         // 14880768 (DUMMY)
@@ -985,12 +989,12 @@ public class CP0Auto extends Codepage {
         this.insertHex("ea", 8, (slice, indent) -> "AGAIN");
         this.insertHex("eb", 8, (slice, indent) -> "AGAINEND");
         this.insertHex("ec", 8, (slice, indent) -> {
-            var r = slice.loadUint(4);
-            var n = slice.loadUint(4);
+            BigInteger r = slice.loadUint(4);
+            BigInteger n = slice.loadUint(4);
             return String.format("%d, %d SETCONTARGS", r.intValue(), n.intValue());
         });
         this.insertHex("ed0", 12, (slice, indent) -> {
-            var p = slice.loadUint(4);
+            BigInteger p = slice.loadUint(4);
             return String.format("%d RETURNARGS", p.intValue());
         });
         this.insertHex("ed10", 16, (slice, indent) -> "RETURNVARARGS");
@@ -1001,44 +1005,44 @@ public class CP0Auto extends Codepage {
         this.insertHex("ed1f", 16, (slice, indent) -> "BLESSVARARGS");
         // 15540224 (DUMMY)
         this.insertHex("ed4", 12, (slice, indent) -> {
-            var n = slice.loadUint(4);
+            BigInteger n = slice.loadUint(4);
             return String.format("c%d PUSH", n.intValue());
         });
         this.insertHex("ed5", 12, (slice, indent) -> {
-            var x = slice.loadUint(4);
+            BigInteger x = slice.loadUint(4);
             return String.format("c%d POP", x.intValue());
         });
         // 15554560 (DUMMY)
         this.insertHex("ed6", 12, (slice, indent) -> {
-            var i = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
             return String.format("c%d SETCONT", i.intValue());
         });
         // 15558656 (DUMMY)
         this.insertHex("ed7", 12, (slice, indent) -> {
-            var i = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
             return String.format("c%d SETRETCTR", i.intValue());
         });
         // 15562752 (DUMMY)
         this.insertHex("ed8", 12, (slice, indent) -> {
-            var i = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
             return String.format("c%d SETALTCTR", i.intValue());
         });
         // 15566848 (DUMMY)
         this.insertHex("ed9", 12, (slice, indent) -> {
-            var i = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
             return String.format("c%d POPSAVE", i.intValue());
         });
         // 15570944 (DUMMY)
         this.insertHex("eda", 12, (slice, indent) -> {
-            var i = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
             return String.format("c%d SAVE", i.intValue());
         });
         this.insertHex("edb", 12, (slice, indent) -> {
-            var i = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
             return String.format("c%d SAVEALT", i.intValue());
         });
         this.insertHex("edc", 12, (slice, indent) -> {
-            var i = slice.loadUint(4);
+            BigInteger i = slice.loadUint(4);
             return String.format("c%d SAVEBOTH", i.intValue());
         });
         this.insertHex("ede0", 16, (slice, indent) -> "PUSHCTRX");
@@ -1058,68 +1062,68 @@ public class CP0Auto extends Codepage {
         this.insertHex("edfb", 16, (slice, indent) -> "SAMEALTSAVE");
         // 15596544 (DUMMY)
         this.insertHex("ee", 8, (slice, indent) -> {
-            var r = slice.loadUint(4);
-            var n = slice.loadUint(4);
+            BigInteger r = slice.loadUint(4);
+            BigInteger n = slice.loadUint(4);
             return String.format("%d,%d BLESSARGS", r.intValue(), n.intValue());
         });
         // 15663104 (DUMMY)
         this.insertHex("f0", 8, (slice, indent) -> {
-            var n = slice.loadUint(8);
+            BigInteger n = slice.loadUint(8);
             return String.format("%d CALLDICT", n.intValue());
         });
         this.insertHex("f10", 10, (slice, indent) -> {
-            var n = slice.loadUint(14);
+            BigInteger n = slice.loadUint(14);
             return String.format("%d CALL", n.intValue());
         });
         this.insertHex("f14", 10, (slice, indent) -> {
-            var args = slice.loadUint(14);
+            BigInteger args = slice.loadUint(14);
             return String.format("%d JMP", args.intValue());
         });
         this.insertHex("f18", 10, (slice, indent) -> {
-            var args = slice.loadUint(14);
+            BigInteger args = slice.loadUint(14);
             return String.format("%d PREPARE", args.intValue());
         });
         // 15843328 (DUMMY)
         this.insertHex("f20", 10, (slice, indent) -> {
-            var nn = slice.loadUint(6);
+            BigInteger nn = slice.loadUint(6);
             return String.format("%d THROW", nn.intValue());
         });
         this.insertHex("F24", 10, (slice, indent) -> {
-            var eCode = slice.loadUint(6);
+            BigInteger eCode = slice.loadUint(6);
             return String.format("%s THROWIF", eCode.intValue());
         });
         this.insertHex("F28", 10, (slice, indent) -> {
-            var eCode = slice.loadUint(6);
+            BigInteger eCode = slice.loadUint(6);
             return String.format("%s THROWIFNOT", eCode.intValue());
         });
         this.insertHex("f2c0", 13, (slice, indent) -> {
-            var args = slice.loadUint(11);
+            BigInteger args = slice.loadUint(11);
             return String.format("%d THROW", args.intValue());
         });
         this.insertHex("f2c8", 13, (slice, indent) -> {
-            var x = slice.loadUint(11);
+            BigInteger x = slice.loadUint(11);
             return String.format("%d THROWARG", x.intValue());
         });
         this.insertHex("f2d0", 13, (slice, indent) -> {
-            var x = slice.loadUint(11);
+            BigInteger x = slice.loadUint(11);
             return String.format("%d THROWIF", x.intValue());
         });
         // codepage.insertHex("f2d8", 13, (slice, indent) => {
-        //     var args = slice.loadUint(11);
+        //     BigInteger args = slice.loadUint(11);
         //     return "(FIXED 1080)";
         // });
         this.insertHex("f2e0", 13, (slice, indent) -> {
-            var x = slice.loadUint(11);
+            BigInteger x = slice.loadUint(11);
             return String.format("%d THROWIFNOT", x.intValue());
         });
         // codepage.insertHex("f2e8", 13, (slice, indent) => {
-        //     var args = slice.loadUint(11);
+        //     BigInteger args = slice.loadUint(11);
         //     return "(FIXED 1088)";
         // });
         this.insertHex("f2f0", 13, (slice, indent) -> {
-            var inverse = slice.loadBit();
-            var cond = slice.loadBit();
-            var arg = slice.loadBit();
+            boolean inverse = slice.loadBit();
+            boolean cond = slice.loadBit();
+            boolean arg = slice.loadBit();
             return String.format("THROW%sANY%s%s",
                     arg ? "ARG" : "",
                     (cond || inverse) ? "IF" : "",
@@ -1128,8 +1132,8 @@ public class CP0Auto extends Codepage {
         // 15922688 (DUMMY)
         this.insertHex("f2ff", 16, (slice, indent) -> "TRY");
         this.insertHex("f3", 8, (slice, indent) -> {
-            var p = slice.loadUint(4);
-            var r = slice.loadUint(4);
+            BigInteger p = slice.loadUint(4);
+            BigInteger r = slice.loadUint(4);
             return String.format("%d,%d TRYARGS", p.intValue(), r.intValue());
         });
         this.insertHex("f400", 16, (slice, indent) -> "STDICT");
@@ -1166,10 +1170,10 @@ public class CP0Auto extends Codepage {
 
         // 15998976 (DUMMY)
         this.insertHex("f420", 13, (slice, indent) -> {
-            var sls = slice.loadBit();
-            var sign = slice.loadBit();
-            var ref = slice.loadBit();
-            var type = "";
+            boolean sls = slice.loadBit();
+            boolean sign = slice.loadBit();
+            boolean ref = slice.loadBit();
+            String type = "";
             if (sls && !sign) {
                 type = "I";
             } else if (sls) {
@@ -1179,10 +1183,10 @@ public class CP0Auto extends Codepage {
         });
 
         this.insertHex("f42a", 13, (slice, indent) -> {
-            var sls = slice.loadBit();
-            var sign = slice.loadBit();
-            var ref = slice.loadBit();
-            var type = "";
+            boolean sls = slice.loadBit();
+            boolean sign = slice.loadBit();
+            boolean ref = slice.loadBit();
+            String type = "";
             if (sls && !sign) {
                 type = "I";
             } else if (sls) {
@@ -1192,10 +1196,10 @@ public class CP0Auto extends Codepage {
         });
         // 16003072 (DUMMY)
         this.insertHex("f432", 13, (slice, indent) -> {
-            var sls = slice.loadBit();
-            var sign = slice.loadBit();
-            var ref = slice.loadBit();
-            var type = "";
+            boolean sls = slice.loadBit();
+            boolean sign = slice.loadBit();
+            boolean ref = slice.loadBit();
+            String type = "";
             if (sls && !sign) {
                 type = "I";
             } else if (sls) {
@@ -1205,10 +1209,10 @@ public class CP0Auto extends Codepage {
         });
         // 16005120 (DUMMY)
         this.insertHex("f43a", 13, (slice, indent) -> {
-            var sls = slice.loadBit();
-            var sign = slice.loadBit();
-            var ref = slice.loadBit();
-            var type = "";
+            boolean sls = slice.loadBit();
+            boolean sign = slice.loadBit();
+            boolean ref = slice.loadBit();
+            String type = "";
             if (sls && !sign) {
                 type = "I";
             } else if (sls) {
@@ -1218,38 +1222,38 @@ public class CP0Auto extends Codepage {
         });
         // 16007168 (DUMMY)
         this.insertHex("f441", 14, (slice, indent) -> {
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
             return String.format("DICT%sSETB", int_ ? (usign ? "U" : "I") : "");
         });
         // 16008192 (DUMMY)
         this.insertHex("f445", 14, (slice, indent) -> {
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
             return String.format("DICT%sSETGETB", int_ ? (usign ? "U" : "I") : "");
         });
         // 16009216 (DUMMY)
         this.insertHex("f449", 14, (slice, indent) -> {
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
             return String.format("DICT%sREPLACEB", int_ ? (usign ? "U" : "I") : "");
         });
         // 16010240 (DUMMY)
         this.insertHex("f44d", 14, (slice, indent) -> {
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
             return String.format("DICT%sREPLACEGETB", int_ ? (usign ? "U" : "I") : "");
         });
         // 16011264 (DUMMY)
         this.insertHex("f451", 14, (slice, indent) -> {
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
             return String.format("DICT%sADDB", int_ ? (usign ? "U" : "I") : "");
         });
         // 16012288 (DUMMY)
         this.insertHex("f455", 14, (slice, indent) -> {
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
             return String.format("DICT%sADDGETB", int_ ? (usign ? "U" : "I") : "");
         });
         // 16013312 (DUMMY)
@@ -1259,10 +1263,10 @@ public class CP0Auto extends Codepage {
 
         // 16014336 (DUMMY)
         this.insertHex("f462", 13, (slice, indent) -> {
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
-            var ref = slice.loadBit();
-            var type = "";
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
+            boolean ref = slice.loadBit();
+            String type = "";
             if (int_ && !usign) {
                 type = "I";
             } else if (int_) {
@@ -1281,7 +1285,7 @@ public class CP0Auto extends Codepage {
         this.insertHex("f46f", 16, (slice, indent) -> "DICTUSETGETOPTREF");
 
         this.insertHex("f47", 12, (slice, indent) -> {
-            var args = slice.loadUint(4);
+            BigInteger args = slice.loadUint(4);
             if (args.equals(BigInteger.ZERO)) {
                 return "PFXDICTSET";
             } else if (args.equals(BigInteger.ONE)) {
@@ -1291,7 +1295,7 @@ public class CP0Auto extends Codepage {
             } else if (args.equals(BigInteger.valueOf(3))) {
                 return "PFXDICTDEL";
             }
-            var res = "DICT";
+            String res = "DICT";
             if (args.testBit(3)) {
                 res += (args.testBit(2) ? "U" : "I");
             }
@@ -1301,12 +1305,12 @@ public class CP0Auto extends Codepage {
                     args.testBit(0) ? "EQ" : "");
         });
         this.insertHex("f48", 11, (slice, indent) -> {
-            var remove = slice.loadBit();
-            var max = slice.loadBit();
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
-            var ref = slice.loadBit();
-            var type = "";
+            boolean remove = slice.loadBit();
+            boolean max = slice.loadBit();
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
+            boolean ref = slice.loadBit();
+            String type = "";
             if (int_ && !usign) {
                 type = "I";
             } else if (int_) {
@@ -1316,23 +1320,23 @@ public class CP0Auto extends Codepage {
         });
 
         this.insertHex("f4a0", 13, (slice, indent) -> {
-            var push = slice.loadBit();
+            boolean push = slice.loadBit();
             if (push) {
-                var subslice = fetchSubSlice(slice, 0, 1);
-                var keyLen = slice.loadUint(10);
+                Cell subslice = fetchSubSlice(slice, 0, 1);
+                BigInteger keyLen = slice.loadUint(10);
                 String decompiled;
                 try {
                     CellSlice csRef = CellSlice.beginParse(CellSlice.beginParse(subslice).loadRef());
                     decompiled = Disassembler.decompileMethodsMap(csRef, keyLen.intValue(), indent);
                 } catch (Exception e) {
                     System.err.println(e.getMessage());
-                    var spacesToAdd = " ".repeat(indent);
+                    String spacesToAdd = this.repeatSpaces(indent);
                     decompiled = subslice.toString() + spacesToAdd;
                 }
                 return String.format("%s %d DICTPUSHCONST", decompiled, keyLen.intValue());
             }
-            var exec = slice.loadBit();
-            var usign = slice.loadBit();
+            boolean exec = slice.loadBit();
+            boolean usign = slice.loadBit();
             return String.format("DICT%sGET%s", usign ? "U" : "I", exec ? "EXEC" : "JMP");
         });
 
@@ -1341,15 +1345,15 @@ public class CP0Auto extends Codepage {
         this.insertHex("f4aa", 16, (slice, indent) -> "PFXDICTGETJMP");
         this.insertHex("f4ab", 16, (slice, indent) -> "PFXDICTGETEXEC");
         // codepage.insertHex("f4ac00", 13, (slice, indent) => {
-        //     var args = slice.loadUint(11);
+        //     BigInteger args = slice.loadUint(11);
         //     return "(EXT)";
         // });
         // 16035840 (DUMMY)
         this.insertHex("f4b1", 13, (slice, indent) -> {
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
-            var ref = slice.loadBit();
-            var type = "";
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
+            boolean ref = slice.loadBit();
+            String type = "";
             if (int_ && !usign) {
                 type = "I";
             } else if (int_) {
@@ -1359,10 +1363,10 @@ public class CP0Auto extends Codepage {
         });
         // 16036864 (DUMMY)
         this.insertHex("f4b5", 13, (slice, indent) -> {
-            var int_ = slice.loadBit();
-            var usign = slice.loadBit();
-            var ref = slice.loadBit();
-            var type = "";
+            boolean int_ = slice.loadBit();
+            boolean usign = slice.loadBit();
+            boolean ref = slice.loadBit();
+            String type = "";
             if (int_ && !usign) {
                 type = "I";
             } else if (int_) {
@@ -1372,8 +1376,8 @@ public class CP0Auto extends Codepage {
         });
         // 16037888 (DUMMY)
         this.insertHex("f4bc", 14, (slice, indent) -> {
-            var exec = slice.loadBit();
-            var unsigned = slice.loadBit();
+            boolean exec = slice.loadBit();
+            boolean unsigned = slice.loadBit();
             return String.format("DICT%sGET%sZ", unsigned ? "U" : "I", exec ? "EXEC" : "JMP");
         });
 
@@ -1390,17 +1394,25 @@ public class CP0Auto extends Codepage {
         this.insertHex("f814", 16, (slice, indent) -> "SETRAND");
         this.insertHex("f815", 16, (slice, indent) -> "ADDRAND");
         this.insertHex("f82", 12, (slice, indent) -> {
-            var i = slice.loadUint(4);
-            return switch (i.intValue()) {
-                case 0x3 -> "NOW";
-                case 0x4 -> "BLOCKLT";
-                case 0x5 -> "LTIME";
-                case 0x6 -> "RANDSEED";
-                case 0x7 -> "BALANCE";
-                case 0x8 -> "MYADDR";
-                case 0x9 -> "CONFIGROOT";
-                default -> String.format("%d GETPARAM", i.intValue());
-            };
+            BigInteger i = slice.loadUint(4);
+            switch (i.intValue()) {
+                case 0x3:
+                    return "NOW";
+                case 0x4:
+                    return "BLOCKLT";
+                case 0x5:
+                    return "LTIME";
+                case 0x6:
+                    return "RANDSEED";
+                case 0x7:
+                    return "BALANCE";
+                case 0x8:
+                    return "MYADDR";
+                case 0x9:
+                    return "CONFIGROOT";
+                default:
+                    return String.format("%d GETPARAM", i.intValue());
+            }
         });
         this.insertHex("f830", 16, (slice, indent) -> "CONFIGDICT");
         // 16265472 (DUMMY)
@@ -1409,12 +1421,12 @@ public class CP0Auto extends Codepage {
         // 16266240 (DUMMY)
         // this.insertHex("f84000", 16, (slice, indent) -> "GETGLOBVAR");
         this.insertHex("f841", 11, (slice, indent) -> {
-            var args = slice.loadUint(5);
+            BigInteger args = slice.loadUint(5);
             return String.format("%d GETGLOBVAR", args);
         });
         // this.insertHex("f86000", 16, (slice, indent) -> "SETGLOBVAR");
         this.insertHex("f861", 11, (slice, indent) -> {
-            var args = slice.loadUint(5);
+            BigInteger args = slice.loadUint(5);
             return String.format("%d SETGLOBVAR", args);
         });
         // 16285696 (DUMMY)
@@ -1458,17 +1470,17 @@ public class CP0Auto extends Codepage {
         this.insertHex("fb07", 16, (slice, indent) -> "CHANGELIB");
         // 16451584 (DUMMY)
         this.insertHex("fe", 8, (slice, indent) -> {
-            var nn = slice.loadUint(8);
+            BigInteger nn = slice.loadUint(8);
             if (nn.and(BigInteger.valueOf(0xf0)).equals(BigInteger.valueOf(0xf0))) {
                 int n = nn.and(BigInteger.valueOf(0x0f)).intValue();
-                var str = new String(slice.loadBytes(n + 1), StandardCharsets.UTF_8);
+                String str = new String(slice.loadBytes(n + 1), StandardCharsets.UTF_8);
                 return String.format("\"%s\" DEBUGSTR", str);
             }
             return String.format("%d DEBUG", nn);
         });
 
         this.insertHex("ff", 8, (slice, indent) -> {
-            var nn = slice.loadUint(8);
+            BigInteger nn = slice.loadUint(8);
             if (nn.and(BigInteger.valueOf(0xf0)).equals(BigInteger.valueOf(0xf0))) {
                 int z = nn.and(BigInteger.valueOf(0x0f)).intValue();
                 if (z == 0) {

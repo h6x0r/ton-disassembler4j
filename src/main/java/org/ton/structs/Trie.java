@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 class TrieNode<T> {
+    public final Character key;
     public TrieNode<T> parent;
     public Map<Character, TrieNode<T>> children;
     public boolean end;
-    public final Character key;
     public T value;
 
     public TrieNode(Character key, T value) {
@@ -52,7 +52,7 @@ public class Trie<T> {
                 node.children.put(ch, new TrieNode<>(ch, null));
                 node.children.get(ch).parent = node;
             }
-            
+
             node = node.children.get(ch);
             if (i == word.length() - 1) {
                 if (!node.children.isEmpty()) {
@@ -91,7 +91,7 @@ public class Trie<T> {
                 return output;
             }
         }
-        findAllWords(node, output, maxOccurrences);
+        this.findAllWords(node, output, maxOccurrences);
         return output;
     }
 
@@ -103,7 +103,7 @@ public class Trie<T> {
             return;
         }
         for (TrieNode<T> child : node.children.values()) {
-            findAllWords(child, arr, maxOccurrences);
+            this.findAllWords(child, arr, maxOccurrences);
         }
     }
 

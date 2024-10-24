@@ -1,7 +1,6 @@
 package org.ton;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.ton.java.address.Address;
 import org.ton.java.cell.Cell;
@@ -13,6 +12,7 @@ import org.ton.java.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -97,26 +97,24 @@ public class DisassemblerTest {
         return code;
     }
 
-
     private String loadSnapshot(String addr) throws IOException {
         Path snapshotPath = Paths.get(TXT_DIR, addr + ".txt");
         if (Files.exists(snapshotPath)) {
-            return Files.readString(snapshotPath);
-        }
-        else {
+            byte[] bytes = Files.readAllBytes(snapshotPath);
+            return new String(bytes, StandardCharsets.UTF_8);
+        } else {
             throw new IOException("Snapshot not found: " + snapshotPath);
         }
     }
 
     private String loadFiftFromFunc() throws IOException {
-        String rawInstruction = """
-                () main() {
-
-                }
-
-                () owner() method_id {
-
-                }""";
+        String rawInstruction = "    () main() {\n" +
+                "\n" +
+                "    }\n" +
+                "\n" +
+                "    () owner() method_id {\n" +
+                "\n" +
+                "    }";
 
         String funcFileName = "test.fc";
         File funcFile = Paths.get(BASE_DIR + funcFileName).toFile();

@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class KnownMethods {
     public static final Map<Integer, String> METHODS;
-    
+
     static {
         Map<Integer, String> map = new HashMap<>();
         map.put(0, "recv_internal");

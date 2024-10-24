@@ -12,6 +12,10 @@ public class CP0Manual extends Codepage {
         init();
     }
 
+    private String repeatSpaces(int count) {
+        return new String(new char[count]).replace('\0', ' ');
+    }
+
     private void init() {
         this.insertHex("0", 4, (slice, indent) -> {
             BigInteger n = slice.loadUint(4);
@@ -120,13 +124,13 @@ public class CP0Manual extends Codepage {
             BigInteger dataBits = args.and(BigInteger.valueOf(127)).shiftLeft(3);
             CellSlice cs = CellSlice.beginParse(slice.loadRef());
             String innerCode = Disassembler.decompile(cs, indent + 2);
-            return String.format("<{\n%s%s}> PUSHCONT", innerCode, " ".repeat(indent));
+            return String.format("<{\n%s%s}> PUSHCONT", innerCode, this.repeatSpaces(indent));
         });
 
         this.insertHex("9", 4, (slice, indent) -> {
             BigInteger len = slice.loadUint(4);
             String innerCode = Disassembler.decompile(slice, indent + 2);
-            return String.format("<{\n%s%s}> PUSHCONT", innerCode, " ".repeat(indent));
+            return String.format("<{\n%s%s}> PUSHCONT", innerCode, this.repeatSpaces(indent));
         });
 
         this.insertHex("A1", 8, (slice, indent) -> "SUB");
@@ -159,14 +163,14 @@ public class CP0Manual extends Codepage {
             }
             if (d.equals(BigInteger.ONE)) {
                 opName.append(" QOUT");
-            } else if (d.equals(BigInteger.TWO)) {
+            } else if (d.equals(BigInteger.valueOf(2))) {
                 opName.append(" REM");
             } else if (d.equals(BigInteger.valueOf(3))) {
                 opName.append(" BOTH");
             }
             if (f.equals(BigInteger.ONE)) {
                 opName.append(" R");
-            } else if (f.equals(BigInteger.TWO)) {
+            } else if (f.equals(BigInteger.valueOf(2))) {
                 opName.append(" C");
             }
             return opName.toString();
