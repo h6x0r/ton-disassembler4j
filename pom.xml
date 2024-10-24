@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.h6x0r</groupId>
@@ -7,8 +8,8 @@
     <version>2.0.4-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <surefire.plugin.version>3.0.0-M7</surefire.plugin.version>
         <maven.compiler.plugin>3.10.1</maven.compiler.plugin>
@@ -42,7 +43,7 @@
         <connection>scm:git:git://github.com/h6x0r/ton-disassembler4j.git</connection>
         <developerConnection>scm:git:git@github.com:h6x0r/ton-disassembler4j.git</developerConnection>
         <url>https://github.com/h6x0r/ton-disassembler4j/tree/main</url>
-        <tag>ton-disassembler4j-2.0.3</tag>
+        <tag>ton-disassembler4j-2.0.4</tag>
     </scm>
 
     <dependencies>
